@@ -19,7 +19,7 @@ if(NOT EXISTS "${METAL_CPP_DIR}")
 endif()
 
 # Build the host executable
-add_executable(metal_kernel main.cpp)
+add_executable(metal_kernel main.cpp verify_vector_add.cpp verify_softmax.cpp)
 target_include_directories(metal_kernel PRIVATE ${METAL_CPP_DIR})
 target_link_libraries(metal_kernel PRIVATE
     "-framework Metal"

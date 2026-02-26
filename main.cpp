@@ -4,6 +4,9 @@
 #include <Foundation/Foundation.hpp>
 #include <Metal/Metal.hpp>
 
+#include "verify_softmax.h"
+#include "verify_vector_add.h"
+
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -271,6 +274,20 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    // Run verification for known kernels
+    bool verified = true;
+    if (kernelName == "vector_add" && buffers.size() >= 3 &&
+        bufferSpecs[0].type == "float" && bufferSpecs[1].type == "float" &&
+        bufferSpecs[2].mode == "out") {
+        auto* a = static_cast<const float*>(buffers[0]->contents());
+        auto* b = static_cast<const float*>(buffers[1]->contents());
+        verified = verify_vector_add(a, b, buffers[2], bufferSpecs[2].count);
+    } else if (kernelName == "softmax" && buffers.size() >= 2 &&
+               bufferSpecs[0].type == "float" && bufferSpecs[1].mode == "out") {
+        auto* input = static_cast<const float*>(buffers[0]->contents());
+        verified = verify_softmax(input, buffers[1], bufferSpecs[1].count);
+    }
+
     // Release resources
     for (auto* buf : buffers) {
         buf->release();
@@ -282,5 +299,5 @@ int main(int argc, char* argv[]) {
     device->release();
 
     std::cout << "Done." << std::endl;
-    return 0;
+    return verified ? 0 : 1;
 }
