@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(vector_add LANGUAGES CXX)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -18,7 +19,7 @@ if(NOT EXISTS "${METAL_CPP_DIR}")
 endif()
 
 # Build the host executable
-add_executable(vector_add main.cpp)
+add_executable(vector_add main.cpp verify_vector_add.cpp)
 target_include_directories(vector_add PRIVATE ${METAL_CPP_DIR})
 target_link_libraries(vector_add PRIVATE
     "-framework Metal"

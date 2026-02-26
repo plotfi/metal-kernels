@@ -4,6 +4,8 @@
 #include <Foundation/Foundation.hpp>
 #include <Metal/Metal.hpp>
 
+#include "verify_vector_add.h"
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -99,24 +101,7 @@ int main() {
     commandBuffer->waitUntilCompleted();
 
     // Verify results
-    auto* result = static_cast<float*>(bufferResult->contents());
-    bool success = true;
-    for (uint32_t i = 0; i < count; i++) {
-        float expected = a[i] + b[i];
-        if (result[i] != expected) {
-            std::cerr << "Mismatch at index " << i
-                      << ": got " << result[i]
-                      << ", expected " << expected << std::endl;
-            success = false;
-            break;
-        }
-    }
-
-    if (success) {
-        std::cout << "SUCCESS: All " << count << " elements matched." << std::endl;
-        std::cout << "Sample: " << a[5] << " + " << b[5] << " = " << result[5]
-                  << std::endl;
-    }
+    bool success = verify_vector_add(a.data(), b.data(), bufferResult, count);
 
     // Release resources
     bufferResult->release();
