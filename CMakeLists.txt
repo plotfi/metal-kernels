@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(vector_add LANGUAGES CXX)
+project(metal_kernel LANGUAGES CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 17)
@@ -19,12 +19,16 @@ if(NOT EXISTS "${METAL_CPP_DIR}")
 endif()
 
 # Build the host executable
-add_executable(vector_add main.cpp verify_vector_add.cpp)
-target_include_directories(vector_add PRIVATE ${METAL_CPP_DIR})
-target_link_libraries(vector_add PRIVATE
+add_executable(metal_kernel main.cpp)
+target_include_directories(metal_kernel PRIVATE ${METAL_CPP_DIR})
+target_link_libraries(metal_kernel PRIVATE
     "-framework Metal"
     "-framework Foundation"
 )
 
-# Copy the Metal shader to the build directory
-configure_file(vector_add.metal ${CMAKE_BINARY_DIR}/vector_add.metal COPYONLY)
+# Copy all Metal shaders to the build directory
+file(GLOB METAL_SHADERS "${CMAKE_SOURCE_DIR}/*.metal")
+foreach(SHADER ${METAL_SHADERS})
+    get_filename_component(SHADER_NAME ${SHADER} NAME)
+    configure_file(${SHADER} ${CMAKE_BINARY_DIR}/${SHADER_NAME} COPYONLY)
+endforeach()
